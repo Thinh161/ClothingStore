@@ -17,8 +17,6 @@ public partial class ClothingStoreContext : DbContext
 
     public virtual DbSet<CartItem> CartItems { get; set; }
 
-    public virtual DbSet<DiscountCoupon> DiscountCoupons { get; set; }
-
     public virtual DbSet<Order> Orders { get; set; }
 
     public virtual DbSet<OrderDetail> OrderDetails { get; set; }
@@ -33,7 +31,7 @@ public partial class ClothingStoreContext : DbContext
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
-        => optionsBuilder.UseSqlServer("server=LAPTOP-BUL3QPCT\\SQLEXPRESS;user Id=sa;password=1;database=ClothingStore; TrustServerCertificate=true");
+        => optionsBuilder.UseSqlServer("server=ADMIN;user Id=sa;password=1;database=ClothingStore;\nTrustServerCertificate=true");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -53,21 +51,9 @@ public partial class ClothingStoreContext : DbContext
                 .HasConstraintName("FK_CartItems_Products");
         });
 
-        modelBuilder.Entity<DiscountCoupon>(entity =>
-        {
-            entity.HasKey(e => e.CouponId);
-
-            entity.HasIndex(e => e.Code, "UQ__Discount__A25C5AA777DE9125").IsUnique();
-
-            entity.Property(e => e.CouponId).HasColumnName("CouponID");
-            entity.Property(e => e.Code).HasMaxLength(50);
-            entity.Property(e => e.DiscountPercent).HasColumnType("decimal(5, 2)");
-        });
-
         modelBuilder.Entity<Order>(entity =>
         {
             entity.Property(e => e.OrderId).HasColumnName("OrderID");
-            entity.Property(e => e.CouponId).HasColumnName("CouponID");
             entity.Property(e => e.OrderDate)
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime");
@@ -77,10 +63,6 @@ public partial class ClothingStoreContext : DbContext
                 .HasDefaultValue("Đang xử lý");
             entity.Property(e => e.TotalAmount).HasColumnType("decimal(12, 2)");
             entity.Property(e => e.UserId).HasColumnName("UserID");
-
-            entity.HasOne(d => d.Coupon).WithMany(p => p.Orders)
-                .HasForeignKey(d => d.CouponId)
-                .HasConstraintName("FK_Orders_DiscountCoupons");
 
             entity.HasOne(d => d.User).WithMany(p => p.Orders)
                 .HasForeignKey(d => d.UserId)
@@ -107,10 +89,10 @@ public partial class ClothingStoreContext : DbContext
         {
             entity.Property(e => e.ProductId).HasColumnName("ProductID");
             entity.Property(e => e.CategoryName).HasMaxLength(100);
-            entity.Property(e => e.ImageUrl)
-                .HasMaxLength(255)
-                .HasColumnName("ImageURL");
-            entity.Property(e => e.IsPromotion).HasDefaultValue(false);
+            entity.Property(e => e.DiscountPercent)
+                .HasDefaultValue(0m)
+                .HasColumnType("decimal(5, 2)");
+            entity.Property(e => e.ImageUrl).HasColumnName("ImageURL");
             entity.Property(e => e.Price).HasColumnType("decimal(10, 2)");
             entity.Property(e => e.ProductName).HasMaxLength(100);
             entity.Property(e => e.Quantity).HasDefaultValue(0);
@@ -143,7 +125,7 @@ public partial class ClothingStoreContext : DbContext
 
         modelBuilder.Entity<User>(entity =>
         {
-            entity.HasIndex(e => e.Username, "UQ__Users__536C85E4808A5AD5").IsUnique();
+            entity.HasIndex(e => e.Username, "UQ__Users__536C85E43C8746D5").IsUnique();
 
             entity.Property(e => e.UserId).HasColumnName("UserID");
             entity.Property(e => e.Email).HasMaxLength(100);
