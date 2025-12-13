@@ -38,8 +38,19 @@ namespace ClothingStore.Areas.Admin.Controllers
         [HttpPost]
         public IActionResult CreateProduct(Product model)
         {
-            context.Products.Add(model); context.SaveChanges();
-            return RedirectToAction("ProductManager");
+            if (ModelState.IsValid)
+            { 
+                context.Products.Add(model); context.SaveChanges();
+                return RedirectToAction("ProductManager");
+
+            }
+            else
+            {
+                return View(model);
+            }
+
+                
+            
         }
 
 
@@ -53,18 +64,25 @@ namespace ClothingStore.Areas.Admin.Controllers
         [HttpPost]
         public IActionResult EditProduct(Product model)
         {
-            Product p = context.Products.Where(x => x.ProductId == model.ProductId).FirstOrDefault();
+            if (ModelState.IsValid)
+            {
+                Product p = context.Products.Where(x => x.ProductId == model.ProductId).FirstOrDefault();
 
-            p.ProductName = model.ProductName;
-            p.Description = model.Description;
-            p.Price = model.Price;
-            p.Stock = model.Stock;
-            p.IsPromotion = model.IsPromotion;
-            p.ImageUrl = model.ImageUrl;
-            p.CategoryName = model.CategoryName;
-            context.SaveChanges();
+                p.ProductName = model.ProductName;
+                p.Description = model.Description;
+                p.Price = model.Price;
+                p.Stock = model.Stock;
+                p.DiscountPercent = model.DiscountPercent;
+                p.ImageUrl = model.ImageUrl;
+                p.CategoryName = model.CategoryName;
+                context.SaveChanges();
 
-            return RedirectToAction("ProductManager");
+                return RedirectToAction("ProductManager");
+            } else
+            {
+                return View(model);
+            }    
+             
         }
 
     }

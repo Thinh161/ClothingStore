@@ -42,12 +42,21 @@
                     {
                         <tr>
                             <td>@item.ProductId</td>
-                            <td class="col-image"><img src="~/img/@item.ImageUrl" alt="Sample" /></td>
+                            <td class="col-image">
+                                <img src="@(string.IsNullOrEmpty(item.ImageUrl)
+                                                                              ? Url.Content("~/img/no-image.png")
+                                                                              : item.ImageUrl.StartsWith("http")
+                                                                                  ? item.ImageUrl
+                                                                                  : Url.Content("~/img/" + item.ImageUrl))"
+                                 alt="@item.ProductName"
+                                 style="width:80px"
+                                 onerror="this.src='/img/no-image.png'" />
+                        </td>
                             <td class="col-name">@item.ProductName</td>
                             <td class="col-category">@item.CategoryName</td>
                             <td class="col-price">@item.Price</td>
                             <td class="col-stock">@item.Stock</td>
-                            <td class="col-discount">@(item.IsPromotion == true ? "Yes" : "No")</td>
+                            <td class="col-discount">@item.DiscountPercent</td>
                             <td class="col-actions">
                                 <a class="btn btn-sm" asp-area="admin" asp-action="EditProduct" asp-controller="Product" asp-route-id="1">Edit</a>
                                 <a class="btn btn-sm btn-primary" asp-area="admin" asp-action="DeleteProduct" asp-controller="Product" asp-route-id="@item.ProductId">Delete</a>

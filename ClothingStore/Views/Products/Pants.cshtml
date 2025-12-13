@@ -12,7 +12,12 @@
             {
                 <div class="product-card">
                     <div class="product-media">
-                        <img src="~/img/@item.ImageUrl" alt="Sample Product" />
+                        <img src="@(item.ImageUrl.StartsWith("http")
+                                 ? item.ImageUrl
+                                 : Url.Content("~/img/" + item.ImageUrl))"
+                         alt="@item.ProductName"
+                         onerror="this.src='/img/no-image.png'" />
+
                         @* <span class="discount-badge">-25%</span> *@
                     </div>
 
